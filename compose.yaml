@@ -1,9 +1,18 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:17
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: shinchoku
+      POSTGRES_USER: shinchoku
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-shinchoku-local}
     ports:
-      - '5432'
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - shinchoku-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shinchoku -d shinchoku"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  shinchoku-postgres:
